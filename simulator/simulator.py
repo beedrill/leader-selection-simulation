@@ -119,7 +119,7 @@ class Simulator():
         valid_time = self.get_valid_time()
         avg_cvg_time = self.get_avg_cvg_time()
 
-        with open('excel/data_row_num.txt') as f:
+        """with open('excel/data_row_num.txt') as f:
             row_num = int(f.read())
             
         rb = xlrd.open_workbook('excel/data.xls')
@@ -139,7 +139,7 @@ class Simulator():
         with open('excel/data_row_num.txt', 'w') as f:
             f.write(str(row_num))
 
-        wb.save('excel/data.xls')
+        wb.save('excel/data.xls')"""
         
         print()
         print("nbr of leader messages: ", self.get_count("leader_msg"))
