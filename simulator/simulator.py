@@ -17,9 +17,11 @@ except Exception:
         sys.exit("please declare environment variable 'SUMO_HOME'")
 
 class Simulator():
-    def __init__(self, route_manager, algorithm_module, connection_module, map_folder, visual = True):
+    
+    def __init__(self, route_manager, algorithm_module, connection_module, map_folder, visual = True, new_route = True):
         self.map_folder = map_folder
         self.visual = visual
+        self.new_route = new_route # boolean use to indicate if we need to create a new route for this simulation
         self.algorithm_module = algorithm_module
         self.connection_module = connection_module
         if visual:
@@ -63,7 +65,10 @@ class Simulator():
         self.max_convergence_time_file = open("stats/max_conv_time.txt", "w")
 
     def init_params(self):
-        self.route_manager.init_routes(False)
+        if self.new_route:
+            print("test")
+            self.route_manager.init_routes(False)
+
         traci.start(self.sumoCmd)
         self.deltaT = traci.simulation.getDeltaT()
 
@@ -90,6 +95,12 @@ class Simulator():
         if self.num_of_picks == 0:
             return math.inf
         return self.avg_convergence_time / self.num_of_picks
+
+    def get_max_cvg_time(self):
+        return self.max_convergence_time
+
+    def get_leader_swicth_count(self):
+        return self.algorithm_module.get_leader_swicth_count()
 
     def get_max_cvg_time(self):
         return self.max_convergence_time

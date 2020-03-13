@@ -13,7 +13,8 @@ sim = Simulator(
     algo, #algorithm module
     connec[2],
     "simulator/maps", #map folder
-    True
+    False,
+    False
     )
 
 

@@ -18,8 +18,8 @@ import math
 class BapRuAlgorithmManager(AlgorithmManager):
 
     # static variable
-    ACTIVATE_SWITCH = True
-    REDUCE_BACKWARD_MESSAGE = False
+    ACTIVATE_SWITCH = False
+    REDUCE_BACKWARD_MESSAGE = True
     PERIOD_FACTOR = 1
     
     def __init__(self, vehicle):
@@ -30,6 +30,7 @@ class BapRuAlgorithmManager(AlgorithmManager):
         self.num_spam = 0
         self.max_spam_number = 3
         self.threshold_dec_freq_msg = 5
+        self.leader_switch_count = 0
 
         self.max_dis_switch_leader = 30
         self.max_leader_force_time = 3
@@ -299,3 +300,7 @@ class BapRuAlgorithmManager(AlgorithmManager):
         msg = self.create_next_leader_msg(new_leader)
         if BapRuAlgorithmManager.ACTIVATE_SWITCH:
             self.connection_manager.broadcast(msg)
+            self.leader_switch_count+=1
+
+    def get_leader_swicth_count(self):
+        return self.leader_swicth_count
