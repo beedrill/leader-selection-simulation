@@ -45,7 +45,10 @@ class AlgorithmManager(object):
         return
 
     def is_leader(self):
-        return self.leader == self.id;
+        return self.leader == self.id
+
+    def get_leader_switch_count(self):
+        return 0
 
 # message type: traffic control message (1)
 # traffic control message: 1,<time of message>,<id of leader>

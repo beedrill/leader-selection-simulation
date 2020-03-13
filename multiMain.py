@@ -22,7 +22,7 @@ for k in range(len(param)):
     nbr_leader_changes = 0
     
     print("use param: ", param[k])
-    algo.activate_switch = param[k]
+    algo.ACTIVATE_SWITCH = param[k]
 
     for i in range(number_simulation):
         print("================================================")

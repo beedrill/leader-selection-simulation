@@ -19,9 +19,9 @@ class BapRuAlgorithmManager(AlgorithmManager):
 
     # static variable
     ACTIVATE_SWITCH = True
+    REDUCE_BACKWARD_MESSAGE = True
     PERIOD_FACTOR = 1 # when the agent is not receiving conflict leader messages, then it set the period to a lower frequency
     # e.g., if original period is 100ms and PERIOD_FACTOR = 1.5, then the broadcast period after convergence will be 150ms
-
     
     def __init__(self, vehicle):
         super(BapRuAlgorithmManager, self).__init__(vehicle)
@@ -31,6 +31,7 @@ class BapRuAlgorithmManager(AlgorithmManager):
         self.num_spam = 0
         self.max_spam_number = 3
         self.threshold_dec_freq_msg = 5
+        self.leader_switch_count = 0
 
         self.max_dis_switch_leader = 30
         self.max_leader_force_time = 3
@@ -153,10 +154,15 @@ class BapRuAlgorithmManager(AlgorithmManager):
             # record the pos of all car
             self.pos_vehicles[msg["vehicle_id"]] = msg
 
+        if not BapRuAlgorithmManager.REDUCE_BACKWARD_MESSAGE:
+            if self.id not in msg["visited"]:
+                msg["visited"].add(self.id)
+                self.connection_manager.broadcast(msg)
         # relay it only if the car which received is closer to the leader
         elif msg["dis_to_leader"] < self.dis_to_leader:
             msg["dis_to_leader"] = self.dis_to_leader
             self.connection_manager.broadcast(msg)
+            
 
     # postion messages
     def create_pos_msg(self):
@@ -168,6 +174,7 @@ class BapRuAlgorithmManager(AlgorithmManager):
             "leader_id": self.leader,
             "lane_position": self.vehicle.lane_position,
             "original_lane": self.vehicle.original_lane,
+            "visited": set(),
             "dis_to_leader": self.dis_to_leader,
             "direction": self.vehicle.get_direction(),
             "time": self.simulator.time
@@ -294,3 +301,7 @@ class BapRuAlgorithmManager(AlgorithmManager):
         msg = self.create_next_leader_msg(new_leader)
         if BapRuAlgorithmManager.ACTIVATE_SWITCH:
             self.connection_manager.broadcast(msg)
+            self.leader_switch_count+=1
+
+    def get_leader_swicth_count(self):
+        return self.leader_swicth_count
