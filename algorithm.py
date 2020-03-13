@@ -335,11 +335,14 @@ class BapAlgorithmManager(AlgorithmManager):
         if msg["leader_id"] != self.leader:
             needToChangeLeader = self.selfCompare(msg)
 
+            # in case the two potential leader are too close from one another
             if self.leader == self.id and abs(msg["lane_position"] - self.vehicle.lane_position) < 0.5:
+                
                 if self.numSpam >= 3:
                     self.numSpam = 0
                     needToChangeLeader =  msg["leader_id"] < self.last_msg_received["leader_id"]
 
+                # count the number of time that situation happened
                 if not needToChangeLeader:
                     self.numSpam += 1
 

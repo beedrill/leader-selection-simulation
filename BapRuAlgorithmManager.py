@@ -18,16 +18,16 @@ import math
 class BapRuAlgorithmManager(AlgorithmManager):
 
     # static variable
-    activate_switch = True
-    period_factor = 1
+    ACTIVATE_SWITCH = True
+    PERIOD_FACTOR = 1
     
     def __init__(self, vehicle):
         super(BapRuAlgorithmManager, self).__init__(vehicle)
         
         self.counter = 0
         self.last_received_leader_message_time = self.simulator.time
-        self.numSpam = 0
-        self.maxSpamNumber = 3
+        self.num_spam = 0
+        self.max_spam_number = 3
         self.threshold_dec_freq_msg = 5
 
         self.max_dis_switch_leader = 30
@@ -64,23 +64,23 @@ class BapRuAlgorithmManager(AlgorithmManager):
             return
 
         if msg["leader_id"] != self.leader:
-            needToChangeLeader = self.selfCompare(msg)
+            need_to_change_leader = self.selfCompare(msg)
 
             # in case two car can't decide to be a leader
             # this condition is not probable in real life
             if self.is_leader() and abs(msg["lane_position"] - self.vehicle.lane_position) < 0.5:
-                if self.numSpam >= self.maxSpamNumber:
-                    self.numSpam = 0
-                    needToChangeLeader =  msg["leader_id"] < self.last_msg_received["leader_id"]
+                if self.num_spam >= self.max_spam_number:
+                    self.num_spam = 0
+                    need_to_change_leader =  msg["leader_id"] < self.last_msg_received["leader_id"]
 
-                if not needToChangeLeader:
-                    self.numSpam += 1
+                if not need_to_change_leader:
+                    self.num_spam += 1
 
             if msg["force_leader"]:
-                needToChangeLeader = True
+                need_to_change_leader = True
             
             # this is the only place we can change the leader
-            if needToChangeLeader:
+            if need_to_change_leader:
                 self.leader = msg["leader_id"]
                 self.last_received_leader_message_time = self.simulator.time
                 self.last_msg_received = msg
@@ -119,7 +119,9 @@ class BapRuAlgorithmManager(AlgorithmManager):
         return set(self.connection_manager.connected_list)
 
     def create_leader_msg(self):
-        # [message_type, car_id, distance to the center of the intersection, lane id, counter, dis_to_leader]
+        # [message_type, leader id, distance to intersecrion center, set of visited car,
+        # id of leader message, frequence between lead messages,
+        # dis from the leader in leader graph, force the leader to stay leader]
         return {
             "type_msg": "leader_msg", 
             "leader_id": self.id,
@@ -131,6 +133,8 @@ class BapRuAlgorithmManager(AlgorithmManager):
             "force_leader": False
         }
 
+    # the 2 next function are used to change the set of visited car in leader message
+
     def add_new_visited(self, msg):
         self.last_msg_received["visited"] = msg["visited"].union(self.last_msg_received["visited"])
 
@@ -138,7 +142,7 @@ class BapRuAlgorithmManager(AlgorithmManager):
         self.last_msg_received["visited"] = self.neighbors().union(self.last_msg_received["visited"])
         self.last_msg_received["dis_to_leader"] += 1
 
-
+    # handle position messages
     def handle_pos_msg(self, msg):
         if msg["leader_id"] != self.leader:
             return 
@@ -147,13 +151,15 @@ class BapRuAlgorithmManager(AlgorithmManager):
             # record the pos of all car
             self.pos_vehicles[msg["vehicle_id"]] = msg
 
+        # relay it only if the car which received is closer to the leader
         elif msg["dis_to_leader"] < self.dis_to_leader:
             msg["dis_to_leader"] = self.dis_to_leader
             self.connection_manager.broadcast(msg)
-        return
 
     # postion messages
     def create_pos_msg(self):
+        # [type message, vehicle id, leader id, distance from the center, original lane
+        #, dis to leader in position message graph, direction, time message sent]
         return {
             "type_msg": "pos_msg",
             "vehicle_id": self.id,
@@ -173,7 +179,7 @@ class BapRuAlgorithmManager(AlgorithmManager):
             # we do this every time, it works better than only one time
             if self.time_leader >= self.threshold_dec_freq_msg:
                 #change the frequency and send the new silent_time
-                self.lead_msg_dt = BapRuAlgorithmManager.period_factor * self.lead_msg_dt
+                self.lead_msg_dt = BapRuAlgorithmManager.PERIOD_FACTOR * self.lead_msg_dt
                 
 
 
@@ -221,7 +227,9 @@ class BapRuAlgorithmManager(AlgorithmManager):
             self.init_leader()
 
     def create_next_leader_msg(self, next_leader):
-        # [message_type, car_id, distance to the center of the intersection, lane id, counter]
+        # [message_type, leader id, distance to intersecrion center, set of visited car,
+        # id of leader message, frequence between lead messages,
+        # dis from the leader in leader graph, force the leader to stay leader]
         return {
             "type_msg": "leader_msg", 
             "leader_id": next_leader,
@@ -230,7 +238,6 @@ class BapRuAlgorithmManager(AlgorithmManager):
             "sequence_number": self.counter,
             "lead_msg_dt": self.lead_msg_dt,
             "dis_to_leader": 0,
-
             "force_leader": True,
             "pos_vehicles": self.pos_vehicles
         }
@@ -254,7 +261,7 @@ class BapRuAlgorithmManager(AlgorithmManager):
 
     # to select the next leader:
     # - we take the closest car in a different direction (n-s or e-w) in a 30m radius
-    # - if there is none, then take the farthest car on the same direction
+    # - if there is none, then take the farthest car on the same direction (deacrese leader switch number)
     def get_next_leader(self):
         
         farthest_same_dir = \
@@ -271,17 +278,17 @@ class BapRuAlgorithmManager(AlgorithmManager):
         return self.get_next_leader_on_lane(farthest_same_dir)
         
 
+    #this method is called when the car leave the intersection
     def leave_intersection(self):
 
         if not self.is_leader():
             return
 
-        #this method is called when the car leave the intersection
         new_leader = self.get_next_leader()
 
         if new_leader is None:
             return
 
         msg = self.create_next_leader_msg(new_leader)
-        if BapRuAlgorithmManager.activate_switch:
+        if BapRuAlgorithmManager.ACTIVATE_SWITCH:
             self.connection_manager.broadcast(msg)

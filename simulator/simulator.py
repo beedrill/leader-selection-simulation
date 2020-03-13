@@ -75,26 +75,26 @@ class Simulator():
 
         self.end_simulation()
 
-    def getCount(self, type_msg):
+    def get_count(self, type_msg):
         count = 0
         for key in self.num_msg_sent:
             count += self.num_msg_sent[key].get(type_msg, 0)
         return count
 
-    def getValidTime(self):
+    def get_valid_time(self):
         if self.num_valid_step == 0:
             return math.inf
         return (self.num_only_one_leader / self.num_valid_step)
     
-    def getAvgCvgTime(self):
+    def get_avg_cvg_time(self):
         if self.num_of_picks == 0:
             return math.inf
         return self.avg_convergence_time / self.num_of_picks
 
-    def getMaxCvgTime(self):
+    def get_max_cvg_time(self):
         return self.max_convergence_time
     
-    def getNbrLeaderChanges(self):
+    def get_nbr_leader_changes(self):
         return self.num_of_picks
 
     def end_simulation(self):
@@ -105,38 +105,38 @@ class Simulator():
         # self.only_one_leader_file.write(str(self.num_only_one_leader / self.num_valid_step))
         # self.max_convergence_time_file.write(str(self.max_convergence_time))
         
-        with open('stats/data_row_num.txt') as f:
+        valid_time = self.get_valid_time()
+        avg_cvg_time = self.get_avg_cvg_time()
+
+        with open('excel/data_row_num.txt') as f:
             row_num = int(f.read())
             
-        rb = xlrd.open_workbook('stats/data.xls')
+        rb = xlrd.open_workbook('excel/data.xls')
         wb = copy(rb)
         w_sheet = wb.get_sheet(0)
 
-        print()
-        print("nbr of leader messages: ", self.getCount("leader_msg"));
-        print("nbr of pos messages: ", self.getCount("pos_msg"));
-        valid_time = self.getValidTime()
-        avg_cvg_time = self.getAvgCvgTime()
-        print("% time with one leader", valid_time * 100)
-        print("avg conv time: ", avg_cvg_time)
-        print("max conv time: ", self.max_convergence_time)
-        print("number of leader changes: ", self.num_of_picks)
-        
-        w_sheet.write(row_num, 0, self.getCount("leader_msg"))
-        w_sheet.write(row_num, 1, self.getCount("pos_msg"))
+        w_sheet.write(row_num, 0, self.get_count("leader_msg"))
+        w_sheet.write(row_num, 1, self.get_count("pos_msg"))
         w_sheet.write(row_num, 2, valid_time)
         w_sheet.write(row_num, 3, avg_cvg_time)
         w_sheet.write(row_num, 4, self.max_convergence_time)
         w_sheet.write(row_num, 5, self.num_of_picks )
-        wb.save('stats/data.xls')
+        wb.save('excel/data.xls')
 
         row_num += 1
 
-        with open('stats/data_row_num.txt', 'w') as f:
+        with open('excel/data_row_num.txt', 'w') as f:
             f.write(str(row_num))
 
-        wb.save('stats/data.xls')
+        wb.save('excel/data.xls')
         
+        print()
+        print("nbr of leader messages: ", self.get_count("leader_msg"))
+        print("nbr of pos messages: ", self.get_count("pos_msg"))
+        print("% time with one leader", valid_time * 100)
+        print("avg conv time: ", avg_cvg_time)
+        print("max conv time: ", self.max_convergence_time)
+        print("number of leader changes: ", self.num_of_picks)
 
     def step(self):
         traci.simulationStep()
@@ -174,7 +174,6 @@ class Simulator():
 
             if self.vehicle_list[vid].is_leader():
                 # leader color
-
                 traci.vehicle.setColor(vid, (255, 255, 255))
             else:
                 # choose a color for the leader
@@ -185,11 +184,11 @@ class Simulator():
                 h2 = (h >> 16) % 128 + 128
                 traci.vehicle.setColor(vid, (h0 , h1 , h2))
         
-        count = self.getCount("leader_msg")
+        count = self.get_count("leader_msg")
 
         self.csvwriter_msg.writerow([self.time, count - self.last_count]) #number_of_msg
 
-        self.last_count = count;
+        self.last_count = count
 
         self.csvwriter_leader.writerow([self.time, 1 if number_of_leader == 1 else 0]) #number_of_leader
 
