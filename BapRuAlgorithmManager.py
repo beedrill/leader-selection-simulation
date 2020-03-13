@@ -19,6 +19,7 @@ class BapRuAlgorithmManager(AlgorithmManager):
 
     # static variable
     ACTIVATE_SWITCH = True
+    REDUCE_BACKWARD_MESSAGE = False
     PERIOD_FACTOR = 1
     
     def __init__(self, vehicle):
@@ -151,10 +152,15 @@ class BapRuAlgorithmManager(AlgorithmManager):
             # record the pos of all car
             self.pos_vehicles[msg["vehicle_id"]] = msg
 
+        if not BapRuAlgorithmManager.REDUCE_BACKWARD_MESSAGE:
+            if self.id not in msg["visited"]:
+                msg["visited"].add(self.id)
+                self.connection_manager.broadcast(msg)
         # relay it only if the car which received is closer to the leader
         elif msg["dis_to_leader"] < self.dis_to_leader:
             msg["dis_to_leader"] = self.dis_to_leader
             self.connection_manager.broadcast(msg)
+            
 
     # postion messages
     def create_pos_msg(self):
@@ -166,6 +172,7 @@ class BapRuAlgorithmManager(AlgorithmManager):
             "leader_id": self.leader,
             "lane_position": self.vehicle.lane_position,
             "original_lane": self.vehicle.original_lane,
+            "visited": set(),
             "dis_to_leader": self.dis_to_leader,
             "direction": self.vehicle.get_direction(),
             "time": self.simulator.time
