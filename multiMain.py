@@ -10,7 +10,8 @@ rm = DefaultRouteManager("simulator/maps")
 
 number_simulation = 10
 
-param = [True, False]
+param = [True, False] # True means implement leader switch
+                      # False is without leader switch
 for k in range(len(param)):
 
     leader_msg_count = 0
@@ -38,12 +39,12 @@ for k in range(len(param)):
         rm.bind_simulator(sim)
         sim.start_simulation()
 
-        leader_msg_count += sim.get_count("leader_msg")
-        pos_msg_count += sim.get_count("pos_msg")
-        valid_time += sim.get_valid_time()
-        avg_cvg_time += sim.get_avg_cvg_time()
-        max_cvg_time += sim.get_max_cvg_time()
-        nbr_leader_changes += sim.get_nbr_leader_changes()
+        leader_msg_count += sim.get_count("leader_msg") # number of leader messages
+        pos_msg_count += sim.get_count("pos_msg") # number of position messages (messages sending back to leader)
+        valid_time += sim.get_valid_time() # valid time percentage of the time having 1 leader
+        avg_cvg_time += sim.get_avg_cvg_time() # average convergence time
+        max_cvg_time += sim.get_max_cvg_time() # maximum convergence time
+        nbr_leader_changes += sim.get_nbr_leader_changes() # number of times leader changes
 
     leader_msg_count /= number_simulation
     pos_msg_count /= number_simulation
