@@ -336,7 +336,7 @@ class BapAlgorithmManager(AlgorithmManager):
             return
         
         if msg["leader_id"] != self.leader:
-            needToChangeLeader = self.selfCompare(msg)
+            needToChangeLeader = self.compare(msg)
 
             # in case the two potential leader are too close from one another
             if self.leader == self.id and abs(msg["lane_position"] - self.vehicle.lane_position) < 0.5:
