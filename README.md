@@ -14,6 +14,16 @@ To cite this code, you can use the following bibtex:
   howpublished = {\url{https://github.com/beedrill/leader-selection-simulation}},
 }
 ```
+
+```
+@inproceedings{zhang2019leader,
+  title={VLeader selection in Vehicular Ad-hoc Networks: a Proactive Approach},
+  author={Zhang, Rusheng and Jacquemot, Baptiste and Bakirci, Kagan and Bartholme, Sacha and Kaempf, Killian and Freydt, Baptiste and Montandon, Loic and Zhang, Shenqi and Tonguz, Ozan},
+  booktitle={2020 IEEE 88th Vehicular Technology Conference (VTC-Fall)},
+  year={2020},
+  organization={IEEE}
+}
+```
 # prerequisites
 - SUMO version > 1.0
 - __SUMO_HOME__ environment parameter specified correctly
@@ -25,7 +35,10 @@ To execute the code, simply do:
 python runner.py
 ```
 
-Algorithm parameters can be specified by checking:
+Algorithm parameters can be specified, check:
 ```bash
 python runner.py -h
 ```
+
+# More details
+You can specify how to run the algorithm in more details, check multiMain.py for example, it contains an example of doing multiple simulations, retrieve usefule data and calculate the average
