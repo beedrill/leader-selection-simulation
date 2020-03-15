@@ -22,7 +22,7 @@ class BapRuAlgorithmManager(AlgorithmManager):
     REDUCE_BACKWARD_MESSAGE = True
     PERIOD_FACTOR = 1 # when the agent is not receiving conflict leader messages, then it set the period to a lower frequency
     # e.g., if original period is 100ms and PERIOD_FACTOR = 1.5, then the broadcast period after convergence will be 150ms
-    
+    HEARTBEAT_FACTOR = 2
     def __init__(self, vehicle):
         super(BapRuAlgorithmManager, self).__init__(vehicle)
         
@@ -58,7 +58,7 @@ class BapRuAlgorithmManager(AlgorithmManager):
     # when a car follow a leader, then it must addapt his silent 
     # time according to the lead msg freq
     def silentTime(self):
-        return self.last_msg_received["lead_msg_dt"] * 3
+        return self.last_msg_received["lead_msg_dt"] * HEARTBEAT_FACTOR
 
 
     def handle_leader_msg(self, msg):
