@@ -2,3 +2,4 @@
 log*
 stats/*
 !stats/.gitkeep
+maps/map.rou.xml

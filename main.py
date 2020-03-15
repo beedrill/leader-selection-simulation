@@ -13,8 +13,8 @@ sim = Simulator(
     algo, #algorithm module
     connec[2],
     "simulator/maps", #map folder
-    False,
-    False
+    visual = False, # set to True if need to visually observe the simulation
+    new_route = True # set to True if not need to re-generate vehicle routes
     )
 
 
