@@ -5,7 +5,14 @@ https://arxiv.org/abs/1912.06776
 # Citing
 To cite this code, you can use the following bibtex:
 ```
-
+@misc{leaderselectionrepo,
+  author = {Rusheng Zhang and Baptiste Jacquemot},
+  title = {Leader Selection Algorithm Repo},
+  year = {2019},
+  publisher = {GitHub},
+  journal = {GitHub repository},
+  howpublished = {\url{https://github.com/beedrill/leader-selection-simulation}},
+}
 ```
 # prerequisites
 SUMO version > 1.0
