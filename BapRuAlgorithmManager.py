@@ -58,7 +58,7 @@ class BapRuAlgorithmManager(AlgorithmManager):
     # when a car follow a leader, then it must addapt his silent 
     # time according to the lead msg freq
     def silentTime(self):
-        return self.last_msg_received["lead_msg_dt"] * HEARTBEAT_FACTOR
+        return self.last_msg_received["lead_msg_dt"] * BapRuAlgorithmManager.HEARTBEAT_FACTOR
 
 
     def handle_leader_msg(self, msg):
