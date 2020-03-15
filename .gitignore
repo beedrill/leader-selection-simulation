@@ -2,4 +2,4 @@
 log*
 stats/*
 !stats/.gitkeep
-maps/map.rou.xml
+simulator/maps/map.rou.xml
