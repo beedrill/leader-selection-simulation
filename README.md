@@ -15,9 +15,9 @@ To cite this code, you can use the following bibtex:
 }
 ```
 # prerequisites
-SUMO version > 1.0
-__SUMO_HOME__ environment parameter specified correctly
-python packages: numpy, scipy, matplotlib, pandas
+- SUMO version > 1.0
+- __SUMO_HOME__ environment parameter specified correctly
+- python packages: numpy, scipy, matplotlib, pandas
 
 # Execute
 To execute the code, simply do:
