@@ -191,13 +191,15 @@ class BapRuAlgorithmManager(AlgorithmManager):
 
         if self.last_lead_msg_sent >= self.lead_msg_dt:
             
-            # we do this every time, it works better than only one time
+            # the time alone is the time that have passed since the leader have not received any messages from 
+            # another leader 
+            
             if self.time_alone < self.threshold_dec_freq_msg:
-                #change the frequency and send the new silent_time
+                # time alone too short, the leader is not stable
                 self.lead_msg_dt = BapRuAlgorithmManager.PERIOD_LEADER_NOT_STABLE
 
             if self.time_alone >= self.threshold_dec_freq_msg:
-                #change the frequency and send the new silent_time
+                # time alone long enouth, we can increase lead message period
                 self.lead_msg_dt = BapRuAlgorithmManager.PERIOD_LEADER_STABLE
                 
 
