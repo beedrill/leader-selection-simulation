@@ -68,7 +68,7 @@ class BapRuAlgorithmManager(AlgorithmManager):
         if msg["leader_id"] == self.id and self.is_leader():
             return
 
-        if msg["leader_id"] == self.id and self.is_leader():
+        if msg["leader_id"] != self.id and self.is_leader():
             self.time_alone = 0
 
         if msg["leader_id"] != self.leader:
