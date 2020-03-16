@@ -355,7 +355,6 @@ class BapAlgorithmManager(AlgorithmManager):
                 self.leader = msg["leader_id"]
                 self.connection_manager.broadcast(msg)
 
-
     
     # replace with the function you want
     # you may need to modify create leader msg if you want to have more information on the leader
