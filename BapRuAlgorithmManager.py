@@ -22,6 +22,7 @@ class BapRuAlgorithmManager(AlgorithmManager):
     REDUCE_BACKWARD_MESSAGE = True
     PERIOD_LEADER_STABLE = 0.1 # when the agent is not receiving conflict leader messages, then it set the period to a lower frequency
     # e.g., if original period is 100ms , then the broadcast period after convergence will be PERIOD_LEADER_STABLE seconds
+    PERIOD_LEADER_NOT_STABLE = 0.1
     HEARTBEAT_FACTOR = 2
     def __init__(self, vehicle):
         super(BapRuAlgorithmManager, self).__init__(vehicle)
@@ -48,7 +49,8 @@ class BapRuAlgorithmManager(AlgorithmManager):
         self.leader = self.id
         self.last_lead_msg_sent = 0
         self.time_leader = 0
-        self.lead_msg_dt = 0.1
+        self.time_alone = 0
+        self.lead_msg_dt = BapRuAlgorithmManager.PERIOD_LEADER_NOT_STABLE
         self.last_msg_received = self.create_leader_msg()
         self.dis_to_leader = 0
 
@@ -65,6 +67,9 @@ class BapRuAlgorithmManager(AlgorithmManager):
 
         if msg["leader_id"] == self.id and self.is_leader():
             return
+
+        if msg["leader_id"] == self.id and self.is_leader():
+            self.time_alone = 0
 
         if msg["leader_id"] != self.leader:
             need_to_change_leader = self.selfCompare(msg)
@@ -182,11 +187,16 @@ class BapRuAlgorithmManager(AlgorithmManager):
 
     def leader_step(self):
         self.time_leader += self.simulator.deltaT
+        self.time_alone += self.simulator.deltaT
 
-        if self.last_lead_msg_sent < self.lead_msg_dt:
+        if self.last_lead_msg_sent >= self.lead_msg_dt:
             
             # we do this every time, it works better than only one time
-            if self.time_leader >= self.threshold_dec_freq_msg:
+            if self.time_alone < self.threshold_dec_freq_msg:
+                #change the frequency and send the new silent_time
+                self.lead_msg_dt = BapRuAlgorithmManager.PERIOD_LEADER_NOT_STABLE
+
+            if self.time_alone >= self.threshold_dec_freq_msg:
                 #change the frequency and send the new silent_time
                 self.lead_msg_dt = BapRuAlgorithmManager.PERIOD_LEADER_STABLE
                 
