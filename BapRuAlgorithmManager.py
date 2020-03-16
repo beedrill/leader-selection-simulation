@@ -20,7 +20,7 @@ class BapRuAlgorithmManager(AlgorithmManager):
     # static variable
     ACTIVATE_SWITCH = True
     REDUCE_BACKWARD_MESSAGE = True
-    PERIOD_LEADER_STABLE = 1 # when the agent is not receiving conflict leader messages, then it set the period to a lower frequency
+    PERIOD_LEADER_STABLE = 0.1 # when the agent is not receiving conflict leader messages, then it set the period to a lower frequency
     # e.g., if original period is 100ms , then the broadcast period after convergence will be PERIOD_LEADER_STABLE seconds
     HEARTBEAT_FACTOR = 2
     def __init__(self, vehicle):
