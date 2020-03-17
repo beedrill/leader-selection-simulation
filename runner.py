@@ -14,8 +14,11 @@ parser.add_argument('--algorithm', default = 'advanced', help='specify algorithm
 parser.add_argument('--explicit_leader_switch', action='store_true', help='implement explicit leader switch')
 parser.add_argument('--channel_condition', default = 'ideal', help='specify channel condition value can be either ideal or harsh')
 parser.add_argument('--stable_period', default = 0.1, type =float, help='period when leader is converged')
+parser.add_argument('--car_flow', default = 0.1, type =float, help='period when leader is converged')
 parser.add_argument('--heartbeat_factor', default = 2, type = float, help='heartbeat factor (if broadcast period is 100ms, heartbeat factor is 2, then the heartbeat detection will be 200ms)')
 parser.add_argument('--optimize_backward_msg_propagation', action='store_true', help='use this to implement the optimization method that reduce the number of backward messages')
+parser.add_argument('--saving_file_name', default = None, type = str, help='specify the file name to save the results')
+parser.add_argument('--trials', default = 1, type = int, help='how many trials to do and get results as average')
 if __name__ == "__main__":
 
     cmd_args = parser.parse_args()
@@ -28,7 +31,7 @@ if __name__ == "__main__":
         sys.exit(1)
 
     ## car flow specification:
-    rm = DefaultRouteManager( map_dir )
+    rm = DefaultRouteManager( map_dir, car_flow = cmd_args.car_flow )
 
     ## explicit leader switch:
     algo.ACTIVATE_SWITCH = cmd_args.explicit_leader_switch
@@ -53,17 +56,41 @@ if __name__ == "__main__":
         sys.exit(1)
 
 
+    total_num_leader_msg = 0
+    total_num_pos_msg = 0
+    total_valid_time = 0
+    total_avg_cvg_time = 0
+    total_max_cvg_time = 0
+    total_num_leader_changes = 0
+
     
-    sim = Simulator(
-        rm,  #route manager
-        algo, #algorithm module
-        connec,
-        "simulator/maps", #map folder
-        visual = False, # set to True if need to visually observe the simulation
-        new_route = True # set to True if not need to re-generate vehicle routes
-        )
+    for _ in range(cmd_args.trials):
+        sim = Simulator(
+            rm,  #route manager
+            algo, #algorithm module
+            connec,
+            "simulator/maps", #map folder
+            visual = False, # set to True if need to visually observe the simulation
+            new_route = True # set to True if not need to re-generate vehicle routes
+            )
+        rm.bind_simulator(sim)
+        sim.start_simulation()
+        total_num_leader_msg += sim.get_count("leader_msg")
+        total_num_pos_msg += sim.get_count("pos_msg")
+        total_valid_time += sim.get_valid_time()
+        total_avg_cvg_time += sim.get_avg_cvg_time()
+        total_max_cvg_time += sim.get_max_cvg_time()
+        total_num_leader_changes += sim.get_nbr_leader_changes()
 
-
-
-    rm.bind_simulator(sim)
-    sim.start_simulation()
+    if cmd_args.saving_file_name:
+        print ('writing to file: stats/'+cmd_args.saving_file_name)
+        f = open('stats/'+cmd_args.saving_file_name, 'a')
+        f.write('{}, {}, {}, {}, {}, {}\n'.format(
+            total_num_leader_msg/cmd_args.trials, #number of leader messages
+            total_num_pos_msg/cmd_args.trials, # number of position messages (messages sending back to leader)
+            total_valid_time/cmd_args.trials, # valid time percentage of the time having 1 leader
+            total_avg_cvg_time/cmd_args.trials, # average convergence time
+            total_max_cvg_time/cmd_args.trials, # maximum convergence time
+            total_num_leader_changes/cmd_args.trials # number of times leader changes
+        ))
+        f.close()

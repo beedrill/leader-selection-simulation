@@ -67,7 +67,7 @@ class Simulator():
     def init_params(self):
         if self.new_route:
             print("test")
-            self.route_manager.init_routes(False)
+            self.route_manager.init_routes()
 
         traci.start(self.sumoCmd)
         self.deltaT = traci.simulation.getDeltaT()
