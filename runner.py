@@ -57,6 +57,7 @@ if __name__ == "__main__":
 
 
     total_num_leader_msg = 0
+    total_orig_num_leader_msg = 0
     total_num_pos_msg = 0
     total_valid_time = 0
     total_avg_cvg_time = 0
@@ -75,7 +76,26 @@ if __name__ == "__main__":
             )
         rm.bind_simulator(sim)
         sim.start_simulation()
+
+        num_leader_msg = sim.get_count("leader_msg")
+        num_orig_leader_msg = sim.get_count("original_leader_msg")
+        num_pos_msg = sim.get_count("pos_msg")
+        valid_time = sim.get_valid_time()
+        avg_cvg_time = sim.get_avg_cvg_time()
+        max_cvg_time = sim.get_max_cvg_time()
+        num_leader_changes = sim.get_nbr_leader_changes()
+
+        print()
+        print("nbr of leader messages: ", num_leader_msg)
+        print("nbr of original leader messages: ", num_orig_leader_msg)
+        print("nbr of pos messages: ", num_pos_msg)
+        print("% time with one leader", valid_time*100)
+        print("avg conv time: ", avg_cvg_time)
+        print("max conv time: ", max_cvg_time)
+        print("number of leader changes: ", num_leader_changes)
+
         total_num_leader_msg += sim.get_count("leader_msg")
+        total_orig_num_leader_msg += sim.get_count("original_leader_msg")
         total_num_pos_msg += sim.get_count("pos_msg")
         total_valid_time += sim.get_valid_time()
         total_avg_cvg_time += sim.get_avg_cvg_time()
@@ -85,8 +105,9 @@ if __name__ == "__main__":
     if cmd_args.saving_file_name:
         print ('writing to file: stats/'+cmd_args.saving_file_name)
         f = open('stats/'+cmd_args.saving_file_name, 'a')
-        f.write('{}, {}, {}, {}, {}, {}\n'.format(
+        f.write('{}, {}, {}, {}, {}, {}, {}\n'.format(
             total_num_leader_msg/cmd_args.trials, #number of leader messages
+            total_orig_num_leader_msg/cmd_args.trials, #number of leader messages sent by leaders only
             total_num_pos_msg/cmd_args.trials, # number of position messages (messages sending back to leader)
             total_valid_time/cmd_args.trials, # valid time percentage of the time having 1 leader
             total_avg_cvg_time/cmd_args.trials, # average convergence time

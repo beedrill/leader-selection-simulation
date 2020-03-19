@@ -45,8 +45,6 @@ class ConnectionManager():
         raise NotImplementedError
 
     def broadcast(self, msg):
-        type_msg = msg["type_msg"]
-        self.num_broadcast[type_msg] = self.num_broadcast.get(type_msg, 0) + 1
         for vid in self.connected_list:
             if vid in self.simulator.vehicle_list.keys():
                 self.simulator.vehicle_list[vid].connection_manager.next_msg_buffer.append(msg)

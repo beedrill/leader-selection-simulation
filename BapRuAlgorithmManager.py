@@ -33,6 +33,7 @@ class BapRuAlgorithmManager(AlgorithmManager):
         self.max_spam_number = 3
         self.threshold_dec_freq_msg = 5
         self.leader_switch_count = 0
+        self.sum = 0
 
         self.max_dis_switch_leader = 30
         self.max_leader_force_time = 3
@@ -104,7 +105,7 @@ class BapRuAlgorithmManager(AlgorithmManager):
                 if(not self.neighbors().issubset(self.last_msg_received["visited"])):
                     # broadcast the message
                     self.add_neighbors_to_visited()
-                    self.connection_manager.broadcast(self.last_msg_received)
+                    self.broadcast(self.last_msg_received)
                 
                 self.dis_to_leader = min(msg["dis_to_leader"] + 1, self.dis_to_leader)
                 self.last_received_leader_message_time = self.simulator.time
@@ -117,6 +118,15 @@ class BapRuAlgorithmManager(AlgorithmManager):
     # you may need to modify create leader msg if you want to have more information on the leader
     def selfCompare(self, msg):
         return self.compare(msg, self.last_msg_received)
+
+    def broadcast(self, msg):
+        # keep up with simulation stats
+        type_msg = msg["type_msg"]
+        self.simulator.num_broadcast[type_msg] = self.simulator.num_broadcast.get(type_msg, 0) + 1
+        if type_msg == "leader_msg" and self.is_leader():
+             self.simulator.num_broadcast["original_leader_msg"] = self.simulator.num_broadcast.get("original_leader_msg", 0) + 1
+
+        self.connection_manager.broadcast(msg)
 
     # replace with the function you want
     # you may need to modify create leader msg if you want to have more information on the leader
@@ -162,11 +172,11 @@ class BapRuAlgorithmManager(AlgorithmManager):
         if not BapRuAlgorithmManager.REDUCE_BACKWARD_MESSAGE:
             if self.id not in msg["visited"]:
                 msg["visited"].add(self.id)
-                self.connection_manager.broadcast(msg)
+                self.broadcast(msg)
         # relay it only if the car which received is closer to the leader
         elif msg["dis_to_leader"] < self.dis_to_leader:
             msg["dis_to_leader"] = self.dis_to_leader
-            self.connection_manager.broadcast(msg)
+            self.broadcast(msg)
             
 
     # postion messages
@@ -212,7 +222,7 @@ class BapRuAlgorithmManager(AlgorithmManager):
 
 
             self.last_received_leader_message_time = self.simulator.time
-            self.connection_manager.broadcast(self.last_msg_received)
+            self.broadcast(self.last_msg_received)
             self.counter += 1
             self.last_lead_msg_sent = 0
         else:
@@ -232,7 +242,7 @@ class BapRuAlgorithmManager(AlgorithmManager):
         if self.is_leader():
             self.leader_step()
         else:
-            self.connection_manager.broadcast(self.create_pos_msg())
+            self.broadcast(self.create_pos_msg())
         
         for msg in self.connection_manager.curr_msg_buffer:
             if msg["type_msg"] == "leader_msg":
@@ -312,8 +322,8 @@ class BapRuAlgorithmManager(AlgorithmManager):
 
         msg = self.create_next_leader_msg(new_leader)
         if BapRuAlgorithmManager.ACTIVATE_SWITCH:
-            self.connection_manager.broadcast(msg)
+            self.broadcast(msg)
             self.leader_switch_count+=1
 
-    def get_leader_swicth_count(self):
-        return self.leader_swicth_count
+    def get_leader_switch_count(self):
+        return self.leader_switch_count

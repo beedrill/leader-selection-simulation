@@ -39,6 +39,8 @@ for k in range(len(param)):
         rm.bind_simulator(sim)
         sim.start_simulation()
 
+        
+
         leader_msg_count += sim.get_count("leader_msg") # number of leader messages
         pos_msg_count += sim.get_count("pos_msg") # number of position messages (messages sending back to leader)
         valid_time += sim.get_valid_time() # valid time percentage of the time having 1 leader
