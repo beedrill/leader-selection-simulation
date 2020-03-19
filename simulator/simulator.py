@@ -49,7 +49,6 @@ class Simulator():
         csvfile_cvg = open('stats/stats_cvg.csv', 'w', newline='')
         self.csvwriter_cvg = csv.writer(csvfile_cvg, delimiter=',')
 
-        self.num_msg_sent = {}
         self.num_msg_file = open("stats/num_msg.txt", "w")
 
         self.num_only_one_leader = 0
@@ -63,10 +62,10 @@ class Simulator():
         self.pick_before = True
         self.last_count = 0
         self.max_convergence_time_file = open("stats/max_conv_time.txt", "w")
+        self.num_broadcast = {}
 
     def init_params(self):
         if self.new_route:
-            print("test")
             self.route_manager.init_routes()
 
         traci.start(self.sumoCmd)
@@ -81,10 +80,7 @@ class Simulator():
         self.end_simulation()
 
     def get_count(self, type_msg):
-        count = 0
-        for key in self.num_msg_sent:
-            count += self.num_msg_sent[key].get(type_msg, 0)
-        return count
+        return self.num_broadcast.get(type_msg, 0)
 
     def get_valid_time(self):
         if self.num_valid_step == 0:
@@ -101,9 +97,6 @@ class Simulator():
 
     def get_leader_swicth_count(self):
         return self.algorithm_module.get_leader_swicth_count()
-
-    def get_max_cvg_time(self):
-        return self.max_convergence_time
     
     def get_nbr_leader_changes(self):
         return self.num_of_picks
@@ -116,38 +109,6 @@ class Simulator():
         # self.only_one_leader_file.write(str(self.num_only_one_leader / self.num_valid_step))
         # self.max_convergence_time_file.write(str(self.max_convergence_time))
         
-        valid_time = self.get_valid_time()
-        avg_cvg_time = self.get_avg_cvg_time()
-
-        """with open('excel/data_row_num.txt') as f:
-            row_num = int(f.read())
-            
-        rb = xlrd.open_workbook('excel/data.xls')
-        wb = copy(rb)
-        w_sheet = wb.get_sheet(0)
-
-        w_sheet.write(row_num, 0, self.get_count("leader_msg"))
-        w_sheet.write(row_num, 1, self.get_count("pos_msg"))
-        w_sheet.write(row_num, 2, valid_time)
-        w_sheet.write(row_num, 3, avg_cvg_time)
-        w_sheet.write(row_num, 4, self.max_convergence_time)
-        w_sheet.write(row_num, 5, self.num_of_picks )
-        wb.save('excel/data.xls')
-
-        row_num += 1
-
-        with open('excel/data_row_num.txt', 'w') as f:
-            f.write(str(row_num))
-
-        wb.save('excel/data.xls')"""
-        
-        print()
-        print("nbr of leader messages: ", self.get_count("leader_msg"))
-        print("nbr of pos messages: ", self.get_count("pos_msg"))
-        print("% time with one leader", valid_time * 100)
-        print("avg conv time: ", avg_cvg_time)
-        print("max conv time: ", self.max_convergence_time)
-        print("number of leader changes: ", self.num_of_picks)
 
     def step(self):
         traci.simulationStep()
@@ -175,7 +136,7 @@ class Simulator():
     def create_stats(self):
         #count the number of leader at a given distance of the intersection center
         distance = 30
-        number_of_leader = 0;
+        number_of_leader = 0
         number_of_car = 0
         for vid in self.vehicle_list:
             if self.vehicle_list[vid].lane_position < distance:
@@ -225,10 +186,6 @@ class Simulator():
                 self.num_of_picks += 1
                 self.pick_before = True
             self.cur_convergence_time = 0
-        
-        for vid in self.vehicle_list:
-            conn = self.vehicle_list[vid].connection_manager
-            self.num_msg_sent[vid] = conn.get_num_broadcast()
         
 
     def maintain_vehicle_list(self):
