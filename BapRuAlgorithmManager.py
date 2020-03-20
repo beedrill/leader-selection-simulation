@@ -31,7 +31,7 @@ class BapRuAlgorithmManager(AlgorithmManager):
         self.last_received_leader_message_time = self.simulator.time
         self.num_spam = 0
         self.max_spam_number = 3
-        self.threshold_dec_freq_msg = 5
+        self.threshold_dec_freq_msg = 2
         self.leader_switch_count = 0
         self.sum = 0
 
