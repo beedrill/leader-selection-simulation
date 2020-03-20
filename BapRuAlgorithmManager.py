@@ -24,6 +24,7 @@ class BapRuAlgorithmManager(AlgorithmManager):
     # e.g., if original period is 100ms , then the broadcast period after convergence will be PERIOD_LEADER_STABLE seconds
     PERIOD_LEADER_NOT_STABLE = 0.1
     HEARTBEAT_FACTOR = 2
+    THRESHOLD_DEC_FREQ_MSG = 0.5 # after this time being alone, the leader decrease the period of broadcasting 
     def __init__(self, vehicle):
         super(BapRuAlgorithmManager, self).__init__(vehicle)
         
@@ -31,9 +32,7 @@ class BapRuAlgorithmManager(AlgorithmManager):
         self.last_received_leader_message_time = self.simulator.time
         self.num_spam = 0
         self.max_spam_number = 3
-        self.threshold_dec_freq_msg = 2
         self.leader_switch_count = 0
-        self.sum = 0
 
         self.max_dis_switch_leader = 30
         self.max_leader_force_time = 3
@@ -204,11 +203,11 @@ class BapRuAlgorithmManager(AlgorithmManager):
             # the time alone is the time that have passed since the leader have not received any messages from 
             # another leader 
             
-            if self.time_alone < self.threshold_dec_freq_msg:
+            if self.time_alone < BapRuAlgorithmManager.THRESHOLD_DEC_FREQ_MSG:
                 # time alone too short, the leader is not stable
                 self.lead_msg_dt = BapRuAlgorithmManager.PERIOD_LEADER_NOT_STABLE
 
-            if self.time_alone >= self.threshold_dec_freq_msg:
+            if self.time_alone >= BapRuAlgorithmManager.THRESHOLD_DEC_FREQ_MSG:
                 # time alone long enouth, we can increase lead message period
                 self.lead_msg_dt = BapRuAlgorithmManager.PERIOD_LEADER_STABLE
                 
