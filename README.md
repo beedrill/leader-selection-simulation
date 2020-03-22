@@ -27,7 +27,7 @@ To cite this code, you can use the following bibtex:
 
 
 # prerequisites
-- SUMO version > 1.0
+- [SUMO](https://sumo.dlr.de/) version > 1.0
 - __SUMO_HOME__ environment parameter specified correctly
 - python packages: numpy, scipy, matplotlib, pandas, to install all required python packages, do:
 ```bash

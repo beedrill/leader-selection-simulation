@@ -16,7 +16,7 @@ parser.add_argument('--channel_condition', default = 'ideal', help='specify chan
 parser.add_argument('--stable_period', default = 0.1, type =float, help='period when leader is converged')
 parser.add_argument('--threshold_dec_freq_msg', default = 0.5, type =float, help='the leader decrease the period of broadcasting after this threshold')
 parser.add_argument('--car_flow', default = 0.1, type =float, help='period when leader is converged')
-parser.add_argument('--heartbeat_factor', default = 2, type = float, help='heartbeat factor (if broadcast period is 100ms, heartbeat factor is 2, then the heartbeat detection will be 200ms)')
+parser.add_argument('--heartbeat_factor', default = 4, type = float, help='heartbeat factor (if broadcast period is 100ms, heartbeat factor is 2, then the heartbeat detection will be 200ms)')
 parser.add_argument('--optimize_backward_msg_propagation', action='store_true', help='use this to implement the optimization method that reduce the number of backward messages')
 parser.add_argument('--saving_file_name', default = None, type = str, help='specify the file name to save the results')
 parser.add_argument('--trials', default = 1, type = int, help='how many trials to do and get results as average')
