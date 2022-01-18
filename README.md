@@ -6,7 +6,7 @@ https://arxiv.org/abs/1912.06776
 To cite the paper, use this Bibtex:
 ```
 @inproceedings{zhang2019leader,
-  title={VLeader selection in Vehicular Ad-hoc Networks: a Proactive Approach},
+  title={Leader selection in Vehicular Ad-hoc Networks: a Proactive Approach},
   author={Zhang, Rusheng and Jacquemot, Baptiste and Bakirci, Kagan and Bartholme, Sacha and Kaempf, Killian and Freydt, Baptiste and Montandon, Loic and Zhang, Shenqi and Tonguz, Ozan},
   booktitle={2020 IEEE 88th Vehicular Technology Conference (VTC-Fall)},
   year={2020},
